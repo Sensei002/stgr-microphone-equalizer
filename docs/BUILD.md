@@ -14,8 +14,9 @@ developers who want to reproduce it.
 ## Reproduce the CI build
 
 ```powershell
-# 1. Fetch the VST3 SDK (headers; used for VST3 hosting)
-git clone --depth 1 https://github.com/steinbergmedia/vst3sdk.git third_party/vst3
+# 1. Fetch the VST3 SDK (headers; used for VST3 hosting).
+#    pluginterfaces is a submodule, so --recurse-submodules is required.
+git clone --depth 1 --recurse-submodules -j 4 https://github.com/steinbergmedia/vst3sdk.git third_party/vst3
 
 # 2. Configure
 cmake -S . -B build -A x64 -DSTGR_VST3_SDK_DIR="%CD%\third_party\vst3" -DSTGR_VST3_FETCH=OFF
