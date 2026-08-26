@@ -25,6 +25,7 @@
 #include "../devices/device_manager.h"
 #include "../plugins/plugin_loader.h"
 #include "../bridge/shm.h"
+#include "../dsp/biquad.h"
 #include "resource.h"
 
 #pragma comment(lib, "comctl32.lib")

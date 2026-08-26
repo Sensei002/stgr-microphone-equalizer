@@ -11,3 +11,7 @@ if(STGR_ENABLE_VST3 AND STGR_VST3_SDK_DIR)
     target_compile_definitions(stgr_plugins PUBLIC STGR_HAVE_VST3=1)
     target_include_directories(stgr_plugins PUBLIC ${STGR_VST3_SDK_DIR})
 endif()
+
+# The version API (GetFileVersionInfoSizeW etc.) is used when scanning
+# plugins for file metadata.
+target_link_libraries(stgr_plugins PRIVATE version)
