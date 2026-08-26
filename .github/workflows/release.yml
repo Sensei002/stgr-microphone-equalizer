@@ -30,7 +30,11 @@ jobs:
       - name: Fetch VST3 SDK
         shell: pwsh
         run: |
+          $ErrorActionPreference = 'Stop'
           git clone --depth 1 https://github.com/steinbergmedia/vst3sdk.git third_party/vst3
+          if (-not (Test-Path "third_party\vst3\pluginterfaces\vst\ivstaudioprocessor.h")) {
+            throw "VST3 SDK fetch incomplete: pluginterfaces headers missing"
+          }
 
       - name: Configure CMake
         shell: pwsh
@@ -39,6 +43,7 @@ jobs:
             -DSTGR_VST3_SDK_DIR="$env:GITHUB_WORKSPACE\third_party\vst3" `
             -DSTGR_VST3_FETCH=OFF `
             -DCMAKE_BUILD_TYPE=Release
+          if ($LASTEXITCODE -ne 0) { throw "cmake configure failed (exit $LASTEXITCODE)" }
 
       - name: Build
         shell: pwsh
