@@ -6,8 +6,9 @@
 
 #ifdef STGR_HAVE_VST3
 // The VST3 headers define interface IID static members; INIT_CLASS_IID
-// makes DECLARE_CLASS_IID emit their definitions in this TU (const ->
-// COMDAT folding on MSVC). This keeps the host header-only.
+// makes DECLARE_CLASS_IID emit their declarations in this TU (the FUID
+// definitions themselves are provided by DEF_CLASS_IID below, which the
+// SDK base/source would normally supply).
 #define INIT_CLASS_IID
 #include <pluginterfaces/base/funknown.h>
 #include <pluginterfaces/base/ipluginbase.h>
@@ -17,6 +18,16 @@
 #include <pluginterfaces/vst/ivsteditcontroller.h>
 #include <pluginterfaces/vst/ivstparameterchanges.h>
 #include <pluginterfaces/vst/vsttypes.h>
+
+// Provide the FUID definitions for the interfaces we use. In a full SDK
+// build these would come from base/source; we supply them here so the host
+// does not need to link the SDK base library.
+DEF_CLASS_IID(FUnknown)
+DEF_CLASS_IID(IBStream)
+DEF_CLASS_IID(IPluginFactory)
+DEF_CLASS_IID(IComponent)
+DEF_CLASS_IID(IAudioProcessor)
+DEF_CLASS_IID(IEditController)
 
 // The SDK declares FUnknownPrivate::atomicAdd in a header but implements it
 // in base/source; provide the (identical) implementation here.
@@ -294,10 +305,10 @@ void Vst3Processor::process(float* interleaved, int frames, int channels)
         outPtrs_[ch] = outBuf_.data() + ch * frames;
 
     busIn_.numChannels = numChannelsIn_;
-    busIn_.buffers.channelBuffers32 = inPtrs_.data();
+    busIn_.channelBuffers32 = inPtrs_.data();
 
     busOut_.numChannels = numChannelsOut_;
-    busOut_.buffers.channelBuffers32 = outPtrs_.data();
+    busOut_.channelBuffers32 = outPtrs_.data();
 
     ProcessData data{};
     data.processMode = kRealtime;
@@ -334,8 +345,6 @@ std::vector<PluginParamInfo> Vst3Processor::parameters()
     int32 count = 0;
     if (ec) {
         count = ec->getParameterCount();
-    } else if (comp) {
-        comp->getParameterCount(count);
     }
     for (int32 i = 0; i < count; ++i) {
         PluginParamInfo p;
@@ -347,11 +356,6 @@ std::vector<PluginParamInfo> Vst3Processor::parameters()
                 p.value = info.defaultNormalizedValue;
                 p.def = info.defaultNormalizedValue;
                 p.stepCount = info.stepCount;
-            }
-        } else if (comp) {
-            if (comp->getParameterInfo(i, info) == kResultOk) {
-                p.name = narrow_name(info.title);
-                p.value = info.defaultNormalizedValue;
             }
         }
         if (p.name.empty()) p.name = "Param " + std::to_string(i);
