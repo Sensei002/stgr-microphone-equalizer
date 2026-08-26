@@ -22,7 +22,7 @@ std::wstring install_dir()
     if (GetEnvironmentVariableW(L"STGR_INSTALL_DIR", env, 512) > 0) {
         return std::wstring(env);
     }
-    // Program Files layout: <install>\STGR\
+    // Program Files layout: <install>\STGR (no trailing backslash here)
     wchar_t pf[512]{};
     if (SHGetFolderPathW(nullptr, CSIDL_PROGRAM_FILES, nullptr, SHGFP_TYPE_CURRENT, pf) == S_OK) {
         return std::wstring(pf) + L"\\STGR";

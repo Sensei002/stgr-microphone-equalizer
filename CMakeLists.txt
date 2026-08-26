@@ -40,8 +40,12 @@ set(STGR_VST3_SDK_DIR "" CACHE PATH "Path to an existing VST3 SDK checkout (over
 # Common flags
 # ---------------------------------------------------------------------------
 add_compile_options(/W3 /EHsc /bigobj /utf-8)
-add_compile_options($<$<CONFIG:Release>:/O2 /Ob2 /Oi /GL>)
-add_compile_options($<$<CONFIG:Debug>:/Od /Zi>)
+add_compile_options($<$<CONFIG:Release>:/O2>)
+add_compile_options($<$<CONFIG:Release>:/Ob2>)
+add_compile_options($<$<CONFIG:Release>:/Oi>)
+add_compile_options($<$<CONFIG:Release>:/GL>)
+add_compile_options($<$<CONFIG:Debug>:/Od>)
+add_compile_options($<$<CONFIG:Debug>:/Zi>)
 add_link_options($<$<CONFIG:Release>:LTCG>)
 
 # Strict floating-point semantics are not needed; allow fast math where safe.
