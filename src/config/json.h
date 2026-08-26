@@ -43,6 +43,10 @@ public:
     static Value array(std::vector<Value> items);
     static Value object(std::map<std::string, Value> members);
 
+    // Public default construction is required by std::map::operator[] and
+    // std::vector resizing.
+    Value() = default;
+
     // serialize
     std::string serialize(bool pretty = false, int indent = 0) const;
 
@@ -53,8 +57,6 @@ private:
     std::string str_val_;
     std::vector<Value> arr_val_;
     std::map<std::string, Value> obj_val_;
-
-    Value() = default;
 };
 
 // Parse a JSON string. Throws on syntax error.

@@ -46,7 +46,7 @@ add_compile_options($<$<CONFIG:Release>:/Oi>)
 add_compile_options($<$<CONFIG:Release>:/GL>)
 add_compile_options($<$<CONFIG:Debug>:/Od>)
 add_compile_options($<$<CONFIG:Debug>:/Zi>)
-add_link_options($<$<CONFIG:Release>:LTCG>)
+add_link_options($<$<CONFIG:Release>:/LTCG>)
 
 # Strict floating-point semantics are not needed; allow fast math where safe.
 add_compile_options($<$<CONFIG:Release>:/fp:fast>)
