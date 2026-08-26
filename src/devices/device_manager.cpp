@@ -55,7 +55,9 @@ bool DeviceManager::enumerate(std::vector<DeviceInfo>& out)
     enumerator->GetDefaultAudioEndpoint(eCapture, eConsole, &defConsole);
 
     IMMDeviceCollection* collection = nullptr;
-    HRESULT hr = enumerator->EnumAudioEndpoints(eCapture, DEVICE_STATE_ALL, &collection);
+    HRESULT hr = enumerator->EnumAudioEndpoints(eCapture,
+        (DWORD)(DEVICE_STATE_ACTIVE | DEVICE_STATE_DISABLED | DEVICE_STATE_NOTPRESENT | DEVICE_STATE_UNPLUGGED),
+        &collection);
     if (FAILED(hr)) {
         if (defComm) defComm->Release();
         if (defConsole) defConsole->Release();

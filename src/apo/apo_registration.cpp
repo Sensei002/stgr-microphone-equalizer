@@ -70,7 +70,7 @@ void write_endpoint_fx(HKEY root, const std::wstring& endpointKey)
     if (RegCreateKeyExW(root, path.c_str(), 0, nullptr, 0, KEY_WRITE, nullptr, &hk, nullptr) != ERROR_SUCCESS)
         return;
 
-    const std::wstring clsid = STGR_APO_CLSID_STRING;
+    const std::wstring clsid = STGR_APO_CLSID_STRING_W;
     RegSetValueExW(hk, kPKeyStreamEffectClsid, 0, REG_SZ, (const BYTE*)clsid.c_str(),
                    (DWORD)(clsid.size() + 1) * sizeof(wchar_t));
     RegSetValueExW(hk, kPKeyAssociation, 0, REG_SZ, (const BYTE*)kKsNodeTypeAny,

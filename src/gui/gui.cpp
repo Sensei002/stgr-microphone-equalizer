@@ -6,6 +6,7 @@
 #include <windows.h>
 #include <winternl.h>
 #include <commctrl.h>
+#include <commdlg.h>
 #include <shellapi.h>
 #include <shlwapi.h>
 #include <string>

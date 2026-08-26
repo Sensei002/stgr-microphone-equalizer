@@ -72,7 +72,7 @@ public:
 // --------------------------------------------------------------------------
 
 inline Value Value::null()                              { Value v; return v; }
-inline Value Value::boolean(bool v)                     { Value v; v.type_ = Type::Bool; v.bool_val_ = v; return v; }
+inline Value Value::boolean(bool v)                     { Value r; r.type_ = Type::Bool; r.bool_val_ = v; return r; }
 inline Value Value::number(double v)                    { Value v2; v2.type_ = Type::Number; v2.num_val_ = v; return v2; }
 inline Value Value::string(const std::string& s)        { Value v; v.type_ = Type::String; v.str_val_ = s; return v; }
 inline Value Value::array(std::vector<Value> items)     { Value v; v.type_ = Type::Array; v.arr_val_ = std::move(items); return v; }

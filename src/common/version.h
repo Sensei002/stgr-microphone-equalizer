@@ -15,8 +15,9 @@
 // Registry identity of the APO registration (audio effects).
 // A single well-known GUID set is used for this product; change all of them
 // together when shipping a new incompatible generation.
-#define STGR_APO_CLSID_STRING       "{A1B2C3D4-5E6F-4A7B-8C9D-0E1F2A3B4C5D}"
-#define STGR_APO_EFFECT_ID_STRING   "{D1E2F3A4-5B6C-4D7E-8F90-123456789ABC}"
+#define STGR_APO_CLSID_STRING       "{6F3D2C1E-9A84-4B5A-8D6B-0C1E2F3A4B5C}"
+#define STGR_APO_CLSID_STRING_W    L"{6F3D2C1E-9A84-4B5A-8D6B-0C1E2F3A4B5C}"
+#define STGR_APO_EFFECT_ID_STRING   "{A1B2C3D4-5E6F-4A7B-8C9D-0E1F2A3B4C5D}"
 
 // Where the APO looks for its per-endpoint configuration.
 #define STGR_CFG_ROOT_NAME   L"STGR"

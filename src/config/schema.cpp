@@ -23,7 +23,7 @@ static inline std::string json_str(const json::Value& obj, const std::string& ke
 // ---------------------------------------------------------------------------
 // FilterType <-> string
 // ---------------------------------------------------------------------------
-static const char* filter_type_name(FilterType t)
+static const char* filter_type_str(FilterType t)
 {
     switch (t) {
         case FilterType::Peaking:   return "Peaking";
@@ -36,7 +36,7 @@ static const char* filter_type_name(FilterType t)
     return "Peaking";
 }
 
-static FilterType filter_type_from_name(const std::string& s)
+static FilterType filter_type_from_str(const std::string& s)
 {
     if (s == "LowShelf")  return FilterType::LowShelf;
     if (s == "HighShelf") return FilterType::HighShelf;
@@ -47,9 +47,10 @@ static FilterType filter_type_from_name(const std::string& s)
 }
 
 // ---------------------------------------------------------------------------
-// StageType <-> string
+// StageType <-> string (named config_* to avoid ADL ambiguity with
+// dsp::stage_type_name from params.h)
 // ---------------------------------------------------------------------------
-static const char* stage_type_name(StageType t)
+static const char* config_stage_type_str(StageType t)
 {
     switch (t) {
         case StageType::Gain:       return "Gain";
@@ -69,7 +70,7 @@ static const char* stage_type_name(StageType t)
     return "Gain";
 }
 
-static StageType stage_type_from_name(const std::string& s)
+static StageType config_stage_type_from_str(const std::string& s)
 {
     if (s == "HighPass")  return StageType::HighPass;
     if (s == "LowPass")   return StageType::LowPass;
@@ -92,10 +93,10 @@ static StageType stage_type_from_name(const std::string& s)
 json::Value stage_params_to_json(const StageParams& p)
 {
     auto obj = json::Value::object({
-        {"type", json::Value::string(stage_type_name(p.type))},
+        {"type", json::Value::string(config_stage_type_str(p.type))},
         {"enabled", json::Value::boolean(p.enabled)},
         {"gainDb", json::Value::number(p.gainDb)},
-        {"filterType", json::Value::string(filter_type_name(p.filterType))},
+        {"filterType", json::Value::string(filter_type_str(p.filterType))},
         {"freq", json::Value::number(p.freq)},
         {"q", json::Value::number(p.q)},
         {"biquadGainDb", json::Value::number(p.biquadGainDb)},
@@ -123,7 +124,7 @@ json::Value stage_params_to_json(const StageParams& p)
         const auto& b = p.bands[i];
         bands.push_back(json::Value::object({
             {"enabled", json::Value::boolean(b.enabled)},
-            {"type", json::Value::string(filter_type_name(b.type))},
+            {"type", json::Value::string(filter_type_str(b.type))},
             {"freq", json::Value::number(b.freq)},
             {"gainDb", json::Value::number(b.gainDb)},
             {"q", json::Value::number(b.q)},
@@ -147,10 +148,10 @@ json::Value stage_params_to_json(const StageParams& p)
 StageParams stage_params_from_json(const json::Value& v)
 {
     StageParams p;
-    p.type = stage_type_from_name(json_str(v, "type", "Gain"));
+    p.type = config_stage_type_from_str(json_str(v, "type", "Gain"));
     p.enabled = json_bool(v, "enabled", true);
     p.gainDb = (float)json_num(v, "gainDb", 0.0);
-    p.filterType = filter_type_from_name(json_str(v, "filterType", "Peaking"));
+    p.filterType = filter_type_from_str(json_str(v, "filterType", "Peaking"));
     p.freq = (float)json_num(v, "freq", 1000.0);
     p.q = (float)json_num(v, "q", 0.707);
     p.biquadGainDb = (float)json_num(v, "biquadGainDb", 0.0);
@@ -180,7 +181,7 @@ StageParams stage_params_from_json(const json::Value& v)
                 const auto& bv = bands[i];
                 auto& b = p.bands[i];
                 b.enabled = json_bool(bv, "enabled", false);
-                b.type = filter_type_from_name(json_str(bv, "type", "Peaking"));
+                b.type = filter_type_from_str(json_str(bv, "type", "Peaking"));
                 b.freq = (float)json_num(bv, "freq", 1000.0);
                 b.gainDb = (float)json_num(bv, "gainDb", 0.0);
                 b.q = (float)json_num(bv, "q", 0.707);
