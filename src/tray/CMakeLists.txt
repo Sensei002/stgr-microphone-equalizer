@@ -10,3 +10,5 @@ target_link_libraries(stgr_tray PRIVATE
 )
 target_compile_definitions(stgr_tray PRIVATE ${STGR_DEFINES})
 set_target_properties(stgr_tray PROPERTIES OUTPUT_NAME "STGRTray")
+# GUI app: wWinMain entry point, no console window.
+set_target_properties(stgr_tray PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")

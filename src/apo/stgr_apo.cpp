@@ -9,6 +9,7 @@
 #include <combaseapi.h>
 #include <propsys.h>
 #include <mmreg.h>
+#include <ks.h>
 #include <ksmedia.h>
 #include <cstring>
 

@@ -22,6 +22,7 @@
 
 #include "../dsp/engine.h"
 #include "../bridge/shm.h"
+#include "apo_guids.h"
 
 namespace stgr::apo {
 
@@ -126,9 +127,6 @@ private:
     std::atomic<UINT64> pushSeq_{1};
     std::atomic<UINT64> lastConsumedSeq_{0};
     HANDLE effectsEvent_{nullptr};
-
-    void ring_init();
-    void bridge_resync();
 };
 
 } // namespace stgr::apo

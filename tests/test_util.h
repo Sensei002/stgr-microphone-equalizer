@@ -10,20 +10,20 @@ static int g_passed = 0, g_failed = 0;
 
 #define CHECK(cond, msg) do { \
     if (!(cond)) { \
-        ++g_failed; \
+        ++::stgr::test::g_failed; \
         printf("FAIL: %s - %s (line %d)\n", msg, #cond, __LINE__); \
     } else { \
-        ++g_passed; \
+        ++::stgr::test::g_passed; \
     } \
 } while(0)
 
 #define CHECK_CLOSE(a, b, eps, msg) do { \
     const double diff = std::fabs((double)(a) - (double)(b)); \
     if (diff > (eps)) { \
-        ++g_failed; \
+        ++::stgr::test::g_failed; \
         printf("FAIL: %s - expected %.15g got %.15g (diff=%g) line %d\n", msg, (double)(b), (double)(a), diff, __LINE__); \
     } else { \
-        ++g_passed; \
+        ++::stgr::test::g_passed; \
     } \
 } while(0)
 

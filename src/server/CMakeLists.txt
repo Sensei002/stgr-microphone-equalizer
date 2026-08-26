@@ -9,3 +9,5 @@ target_link_libraries(stgr_server PRIVATE
 )
 target_compile_definitions(stgr_server PRIVATE ${STGR_DEFINES})
 set_target_properties(stgr_server PROPERTIES OUTPUT_NAME "STGRAudioServer")
+# Headless process started at logon: no console window (wmain entry).
+set_target_properties(stgr_server PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS /ENTRY:wmainCRTStartup")

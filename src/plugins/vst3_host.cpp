@@ -16,7 +16,6 @@
 #include <pluginterfaces/vst/ivstcomponent.h>
 #include <pluginterfaces/vst/ivsteditcontroller.h>
 #include <pluginterfaces/vst/ivstparameterchanges.h>
-#include <pluginterfaces/vst/ivstpluginfactory.h>
 #include <pluginterfaces/vst/vsttypes.h>
 
 // The SDK declares FUnknownPrivate::atomicAdd in a header but implements it

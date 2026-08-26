@@ -14,3 +14,5 @@ target_link_libraries(stgr_gui PRIVATE
 )
 target_compile_definitions(stgr_gui PRIVATE ${STGR_DEFINES})
 set_target_properties(stgr_gui PROPERTIES OUTPUT_NAME "STGRMicrophoneEqualizer")
+# GUI app: wWinMain entry point, no console window.
+set_target_properties(stgr_gui PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")

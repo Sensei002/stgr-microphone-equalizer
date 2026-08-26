@@ -200,7 +200,12 @@ void Vst2Processor::process(float* interleaved, int frames, int channels)
     if (canReplacing_ && effect_->processReplacing) {
         effect_->processReplacing(effect_, inPtrs_.data(), outPtrs_.data(), frames);
     } else if (effect_->process) {
-        effect_->process(effect_, inPtrs_.data(), outPtrs_.data(), frames);
+        // Legacy VST (< 2.0) non-replacing process. The plugin implements a
+        // 4-arg function (effect, inputs, outputs, sampleFrames) reached
+        // through the host-callback slot; extra trailing arguments are
+        // ignored by the ABI.
+        effect_->process(effect_, (intptr_t)inPtrs_.data(), (intptr_t)outPtrs_.data(),
+                         (intptr_t)frames, nullptr, 0.0f);
     }
 
     // Re-interleave to bridge output (mono mixdown).

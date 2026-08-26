@@ -5,6 +5,7 @@
 #include "../common/util.h"
 #include "../config/json.h"
 #include <shlobj.h>
+#include <knownfolders.h>
 #include <winver.h>
 #include <cstdlib>
 #include <ctime>
@@ -14,29 +15,44 @@ namespace stgr::plugins {
 std::vector<std::wstring> default_vst3_dirs()
 {
     std::vector<std::wstring> dirs;
-    wchar_t common[512]{};
-    if (SHGetFolderPathW(nullptr, CSIDL_COMMON_PROGRAM_FILES, nullptr, SHGFP_TYPE_CURRENT, common) == S_OK)
-        dirs.push_back(std::wstring(common) + L"\\Common Files\\VST3");
-    wchar_t appdata[512]{};
-    if (SHGetFolderPathW(nullptr, CSIDL_APPDATA, nullptr, SHGFP_TYPE_CURRENT, appdata) == S_OK)
-        dirs.push_back(std::wstring(appdata) + L"\\VST3");
+    PWSTR pf = nullptr;
+    // VST3: %ProgramFiles%\Common Files\VST3
+    if (SHGetKnownFolderPath(FOLDERID_ProgramFilesCommon, 0, nullptr, &pf) == S_OK && pf) {
+        dirs.push_back(std::wstring(pf) + L"\\VST3");
+        CoTaskMemFree(pf);
+    }
+    // VST3: %APPDATA%\VST3
+    if (SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, nullptr, &pf) == S_OK && pf) {
+        dirs.push_back(std::wstring(pf) + L"\\VST3");
+        CoTaskMemFree(pf);
+    }
     return dirs;
 }
 
 std::vector<std::wstring> default_vst2_dirs()
 {
     std::vector<std::wstring> dirs;
-    wchar_t common[512]{};
-    if (SHGetFolderPathW(nullptr, CSIDL_COMMON_PROGRAM_FILES, nullptr, SHGFP_TYPE_CURRENT, common) == S_OK) {
-        dirs.push_back(std::wstring(common) + L"\\Steinberg\\VstPlugins");
-        dirs.push_back(std::wstring(common) + L"\\Common Files\\VST2");
+    PWSTR pf = nullptr;
+    // %ProgramFiles%\Steinberg\VstPlugins
+    if (SHGetKnownFolderPath(FOLDERID_ProgramFiles, 0, nullptr, &pf) == S_OK && pf) {
+        dirs.push_back(std::wstring(pf) + L"\\Steinberg\\VstPlugins");
+        CoTaskMemFree(pf);
     }
-    wchar_t appdata[512]{};
-    if (SHGetFolderPathW(nullptr, CSIDL_APPDATA, nullptr, SHGFP_TYPE_CURRENT, appdata) == S_OK)
-        dirs.push_back(std::wstring(appdata) + L"\\VST");
-    wchar_t pf[512]{};
-    if (SHGetFolderPathW(nullptr, CSIDL_PROGRAM_FILES, nullptr, SHGFP_TYPE_CURRENT, pf) == S_OK)
+    // %ProgramFiles%\Common Files\VST2
+    if (SHGetKnownFolderPath(FOLDERID_ProgramFilesCommon, 0, nullptr, &pf) == S_OK && pf) {
+        dirs.push_back(std::wstring(pf) + L"\\VST2");
+        CoTaskMemFree(pf);
+    }
+    // %APPDATA%\VST
+    if (SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, nullptr, &pf) == S_OK && pf) {
+        dirs.push_back(std::wstring(pf) + L"\\VST");
+        CoTaskMemFree(pf);
+    }
+    // %ProgramFiles%\VSTPlugins
+    if (SHGetKnownFolderPath(FOLDERID_ProgramFiles, 0, nullptr, &pf) == S_OK && pf) {
         dirs.push_back(std::wstring(pf) + L"\\VSTPlugins");
+        CoTaskMemFree(pf);
+    }
     return dirs;
 }
 
