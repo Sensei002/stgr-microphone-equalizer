@@ -1,4 +1,5 @@
 #include "device_manager.h"
+#include "../common/util.h"
 #include <functiondiscoverykeys_devpkey.h>
 #include <propkey.h>
 #include <propsys.h>

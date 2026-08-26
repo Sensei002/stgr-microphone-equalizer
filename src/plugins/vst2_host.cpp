@@ -5,6 +5,7 @@
 #include "../common/util.h"
 #include <windows.h>
 #include <cstdint>
+#include <cstdlib>
 #include <cstring>
 #include <vector>
 
