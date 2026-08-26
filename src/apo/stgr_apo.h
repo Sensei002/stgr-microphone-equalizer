@@ -29,8 +29,7 @@ namespace stgr::apo {
 class StgrApo final : public IAudioProcessingObject,
                      public IAudioProcessingObjectConfiguration,
                      public IAudioProcessingObjectRT,
-                     public IAudioSystemEffects,
-                     public IAudioSystemEffects2,
+                     public IAudioSystemEffects2, // includes IAudioSystemEffects (marker)
                      public dsp::PluginBridgeSink {
 public:
     StgrApo();

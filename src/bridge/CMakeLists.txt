@@ -1,4 +1,5 @@
 add_library(stgr_bridge STATIC
+    dummy.cpp
     shm.h
 )
 target_include_directories(stgr_bridge PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

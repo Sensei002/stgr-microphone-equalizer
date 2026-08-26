@@ -127,9 +127,15 @@ void test_engine()
     engine.set_config(std::move(cfg), 0);
 
     float buf[480] = {};
-    std::fill_n(buf, 480, 1.0f);
-    engine.process(buf, 480);
-    CHECK_CLOSE(buf[0], 0.5f, 0.01f, "engine -6 dB gain");
+    // The gain stage ramps over ~5 ms (anti-zipper); process three fresh
+    // blocks (~30 ms) so the smoothed gain converges before we assert.
+    float steady = 0.0f;
+    for (int i = 0; i < 3; ++i) {
+        std::fill_n(buf, 480, 1.0f);
+        engine.process(buf, 480);
+        steady = buf[479];
+    }
+    CHECK_CLOSE(steady, 0.5f, 0.01f, "engine -6 dB gain");
     CHECK(!std::isnan(buf[0]), "no NaN");
     CHECK(!std::isinf(buf[0]), "no inf");
 }

@@ -863,7 +863,7 @@ void open_plugin_dialog(App& a)
     RECT wr{};
     GetWindowRect(a.hwnd, &wr);
     const int w = 540, h = 340;
-    CreateWindowExW(WS_EX_DIALOGFRAME, L"StgrPluginDialog", L"Add Plugin",
+    CreateWindowExW(WS_EX_WINDOWEDGE, L"StgrPluginDialog", L"Add Plugin",
                     WS_POPUP | WS_CAPTION | WS_SYSMENU,
                     wr.left + (wr.right - wr.left - w) / 2,
                     wr.top + (wr.bottom - wr.top - h) / 2,
@@ -893,9 +893,9 @@ void spawn_admin(App& a, const std::wstring& args)
         CloseHandle(pi.hProcess);
         CloseHandle(pi.hThread);
     } else {
-        MessageBoxW(a.hwnd, L"Could not start the elevated helper.\n\n"
+        MessageBoxW(a.hwnd, (L"Could not start the elevated helper.\n\n"
                      L"Run the operation from an administrator console:\n"
-                     + exe + L" " + args,
+                     + exe + L" " + args).c_str(),
                      L"STGR - elevation required", MB_ICONWARNING);
     }
 }
@@ -1106,7 +1106,7 @@ void fill_diagnostics(App& a, HWND edit)
     text += L"STGR Microphone Equalizer " STGR_VERSION_STRING_W L"\r\n\r\n";
 
     OSVERSIONINFOW osi{sizeof(osi)};
-    RtlGetVersion(&osi);
+    GetVersionExW(&osi);
     swprintf(buf, 512, L"Windows: %u.%u.%u\r\n", osi.dwMajorVersion, osi.dwMinorVersion, osi.dwBuildNumber);
     text += buf;
 
@@ -1447,7 +1447,7 @@ bool InputBox(HWND parent, const wchar_t* prompt, const wchar_t* title,
     const int x = wr.left + (wr.right - wr.left - W) / 2;
     const int y = wr.top + (wr.bottom - wr.top - H) / 2;
 
-    HWND dlg = CreateWindowExW(WS_EX_DIALOGFRAME, L"STATIC", title, WS_POPUP | WS_CAPTION | WS_SYSMENU,
+    HWND dlg = CreateWindowExW(WS_EX_WINDOWEDGE, L"STATIC", title, WS_POPUP | WS_CAPTION | WS_SYSMENU,
                                x, y, W, H, parent, nullptr, g_app.hInst, nullptr);
     CreateWindowExW(0, L"STATIC", prompt, WS_CHILD | WS_VISIBLE, 16, 14, W - 32, 18,
                     dlg, nullptr, g_app.hInst, nullptr);

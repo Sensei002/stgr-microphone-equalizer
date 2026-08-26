@@ -10,6 +10,7 @@ target_link_libraries(stgr_apo_reg PRIVATE advapi32)
 add_library(stgr_apo SHARED
     apo_dll.cpp
     stgr_apo.cpp
+    stgr_apo.def
 )
 
 target_include_directories(stgr_apo PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

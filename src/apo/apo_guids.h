@@ -1,6 +1,10 @@
 // GUIDs for the STGR APO COM component.
 #pragma once
 #include <guiddef.h>
+#include <initguid.h>
+
+// initguid.h turns DEFINE_GUID below into definitions (COMDAT on MSVC) so
+// the GUID objects exist at link time.
 
 // The STGR SFX APO COM class.
 DEFINE_GUID(CLSID_STGR_APO,
