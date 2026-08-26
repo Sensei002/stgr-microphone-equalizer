@@ -37,6 +37,7 @@ namespace stgr::plugins {
 namespace vst3 {
 
 using namespace Steinberg;
+using namespace Steinberg::Vst; // IComponent, IAudioProcessor, AudioBusBuffers, ...
 
 // ParameterInfo.title is UTF-16; narrow it for our config (ASCII plugin
 // names are the norm; non-ASCII names degrade gracefully).
