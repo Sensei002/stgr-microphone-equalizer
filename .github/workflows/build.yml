@@ -69,7 +69,13 @@ jobs:
       - name: Verify APO DLL exports
         shell: pwsh
         run: |
-          $exports = & dumpbin /exports .\build\bin\Release\stgr_apo.dll
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          $vsPath = & $vswhere -latest -products * -property installationPath
+          if (-not $vsPath) { Write-Warning "vswhere not found - skipping export check"; exit 0 }
+          $dumpbin = Get-ChildItem "$vsPath\VC\Tools\MSVC\*\bin\Hostx64\x64\dumpbin.exe" |
+                     Sort-Object FullName -Descending | Select-Object -First 1
+          if (-not $dumpbin) { Write-Warning "dumpbin not found - skipping export check"; exit 0 }
+          $exports = & $dumpbin.FullName /exports .\build\bin\Release\stgr_apo.dll
           foreach ($name in @("DllGetClassObject", "DllCanUnloadNow", "DllRegisterServer", "DllUnregisterServer")) {
             if ($exports -match $name) { Write-Host "$name OK" } else { throw "Missing export: $name" }
           }
