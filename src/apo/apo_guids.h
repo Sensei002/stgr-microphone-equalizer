@@ -1,0 +1,21 @@
+// GUIDs for the STGR APO COM component.
+#pragma once
+#include <guiddef.h>
+
+// The STGR SFX APO COM class.
+DEFINE_GUID(CLSID_STGR_APO,
+    0x6F3D2C1E, 0x9A84, 0x4B5A, 0x8D, 0x6B, 0x0C, 0x1E, 0x2F, 0x3A, 0x4B, 0x5C);
+
+// The effect id reported to Windows for effect discovery
+// (IAudioSystemEffects2::GetEffectsList).
+DEFINE_GUID(STGR_EFFECT_ID,
+    0xA1B2C3D4, 0x5E6F, 0x4A7B, 0x8C, 0x9D, 0x0E, 0x1F, 0x2A, 0x3B, 0x4C, 0x5D);
+
+// Default signal processing mode (no raw bypass).
+DEFINE_GUID(STGR_MODE_DEFAULT,
+    0xC18E2F7E, 0x933D, 0x4965, 0xB7, 0xD1, 0x1E, 0xEF, 0x22, 0x8D, 0x2A, 0xF3);
+
+// PKEY_FX_StreamEffectClsid property key fmtid/pid used when attaching to
+// endpoints via the FxProperties registry store.
+#define STGR_PKEY_FX_STREAMCLSID_FMTID 0xD04E05A6, 0x594B, 0x4FB6, 0xA8, 0x0D, 0x01, 0xAF, 0x5E, 0xED, 0x7D, 0x1D
+#define STGR_PKEY_FX_STREAMCLSID_PID   5

@@ -1,0 +1,88 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build and release
+    runs-on: windows-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve version from tag
+        id: version
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $ver = $tag -replace '^v', ''
+          Write-Host "version=$ver" >> $env:GITHUB_OUTPUT
+
+      - name: Fetch VST3 SDK
+        shell: pwsh
+        run: |
+          git clone --depth 1 https://github.com/steinbergmedia/vst3sdk.git third_party/vst3
+
+      - name: Configure CMake
+        shell: pwsh
+        run: |
+          cmake -S . -B build -A x64 `
+            -DSTGR_VST3_SDK_DIR="$env:GITHUB_WORKSPACE\third_party\vst3" `
+            -DSTGR_VST3_FETCH=OFF `
+            -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        shell: pwsh
+        run: |
+          cmake --build build --config Release --parallel
+
+      - name: Run unit tests
+        shell: pwsh
+        run: |
+          ctest --test-dir build -C Release --output-on-failure
+
+      - name: Run DSP benchmark
+        shell: pwsh
+        run: |
+          .\build\bin\Release\STGRBench.exe | Tee-Object -FilePath benchmark.txt
+
+      - name: Package installer
+        shell: pwsh
+        run: |
+          .\scripts\package.ps1 -Version "${{ steps.version.outputs.version }}"
+
+      - name: Compute checksums
+        shell: pwsh
+        run: |
+          Get-ChildItem .\installer\dist\* -File | ForEach-Object {
+            $hash = (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower()
+            "$hash *$($_.Name)" | Add-Content .\installer\dist\SHA256SUMS.txt
+          }
+
+      - name: Upload benchmark
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-report
+          path: benchmark.txt
+
+      - name: Create GitHub Release
+        shell: pwsh
+        run: |
+          gh release create "${{ github.ref_name }}" `
+            .\installer\dist\STGR-Microphone-Equalizer-${{ steps.version.outputs.version }}-x64.exe `
+            .\installer\dist\SHA256SUMS.txt `
+            .\installer\dist\*.zip `
+            benchmark.txt `
+            --title "STGR Microphone Equalizer ${{ steps.version.outputs.version }}" `
+            --notes "Automated release built by GitHub Actions.`n`n- Native x64 Windows 10/11`n- SFX APO microphone processing`n- EQ, dynamics, limiter`n- VST2 + VST3 hosting (out-of-process bridge)`n`n> Note: release binaries are unsigned. See docs/INSTALLATION.md for signing requirements of the APO DLL on Windows 10 1903+."
+        env:
+          GH_TOKEN: ${{ github.token }}

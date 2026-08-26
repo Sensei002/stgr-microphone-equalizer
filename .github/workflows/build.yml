@@ -1,0 +1,90 @@
+name: Build
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build x64 Release
+    runs-on: windows-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Fetch VST3 SDK (header-only interfaces)
+        shell: pwsh
+        run: |
+          git clone --depth 1 https://github.com/steinbergmedia/vst3sdk.git third_party/vst3
+          Write-Host "VST3 SDK fetched"
+
+      - name: Configure CMake
+        shell: pwsh
+        run: |
+          cmake -S . -B build -A x64 `
+            -DSTGR_VST3_SDK_DIR="$env:GITHUB_WORKSPACE\third_party\vst3" `
+            -DSTGR_VST3_FETCH=OFF `
+            -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        shell: pwsh
+        run: |
+          cmake --build build --config Release --parallel
+
+      - name: Run unit tests
+        shell: pwsh
+        run: |
+          ctest --test-dir build -C Release --output-on-failure
+
+      - name: Run DSP benchmark
+        shell: pwsh
+        run: |
+          .\build\bin\Release\STGRBench.exe | Tee-Object -FilePath benchmark.txt
+          Get-Content benchmark.txt
+
+      - name: Upload benchmark report
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-report
+          path: benchmark.txt
+          if-no-files-found: error
+
+      - name: Verify APO DLL exports
+        shell: pwsh
+        run: |
+          $exports = & dumpbin /exports .\build\bin\Release\stgr_apo.dll
+          foreach ($name in @("DllGetClassObject", "DllCanUnloadNow", "DllRegisterServer", "DllUnregisterServer")) {
+            if ($exports -match $name) { Write-Host "$name OK" } else { throw "Missing export: $name" }
+          }
+
+      - name: Package installer
+        shell: pwsh
+        run: |
+          .\scripts\package.ps1 -Version "1.0.0"
+
+      - name: Compute checksums
+        shell: pwsh
+        run: |
+          Get-ChildItem .\installer\dist\* | ForEach-Object {
+            $hash = (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower()
+            "$hash *$($_.Name)" | Add-Content .\installer\dist\SHA256SUMS.txt
+          }
+          Get-Content .\installer\dist\SHA256SUMS.txt
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: stgr-microphone-equalizer-x64
+          path: |
+            build/bin/Release/*.exe
+            build/bin/Release/stgr_apo.dll
+            installer/dist/*
+          if-no-files-found: error

@@ -1,0 +1,5 @@
+add_executable(stgr_bench bench.cpp)
+target_include_directories(stgr_bench PRIVATE ${CMAKE_SOURCE_DIR}/src)
+target_link_libraries(stgr_bench PRIVATE stgr_dsp stgr_config stgr_common)
+target_compile_definitions(stgr_bench PRIVATE ${STGR_DEFINES})
+set_target_properties(stgr_bench PROPERTIES OUTPUT_NAME "STGRBench")

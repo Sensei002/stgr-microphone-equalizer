@@ -1,0 +1,51 @@
+# Build output
+build/
+build-*/
+out/
+cmake-build-*/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.VC.db
+*.VC.opendb
+
+# Binaries and artifacts
+*.exe
+*.dll
+*.pdb
+*.lib
+*.exp
+*.obj
+*.ilk
+*.ini
+*.iss
+!installer/*.iss
+artifacts/
+
+# Installer output
+installer/dist/
+installer/*.exe
+
+# VST3 SDK fetch
+third_party/vst3/
+third_party/sdk/
+
+# Test artifacts
+Testing/
+*.xml.bak
+*.log
+
+# Logs
+logs/
+*.log
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# IDE
+.idea/
+*.iml
