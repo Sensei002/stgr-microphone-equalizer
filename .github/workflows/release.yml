@@ -31,6 +31,7 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
+          New-Item -ItemType Directory -Force -Path "third_party" | Out-Null
           git clone --depth 1 https://github.com/steinbergmedia/vst3sdk.git third_party/vst3
           if (-not (Test-Path "third_party\vst3\pluginterfaces\vst\ivstaudioprocessor.h")) {
             throw "VST3 SDK fetch incomplete: pluginterfaces headers missing"
