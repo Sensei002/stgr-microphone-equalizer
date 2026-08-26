@@ -6,9 +6,8 @@
 
 #ifdef STGR_HAVE_VST3
 // The VST3 headers define interface IID static members; INIT_CLASS_IID
-// makes DECLARE_CLASS_IID emit their declarations in this TU (the FUID
-// definitions themselves are provided by DEF_CLASS_IID below, which the
-// SDK base/source would normally supply).
+// makes DECLARE_CLASS_IID emit both the TUID and the FUID definition in
+// this TU (normally supplied by the SDK's base/source).
 #define INIT_CLASS_IID
 #include <pluginterfaces/base/funknown.h>
 #include <pluginterfaces/base/ipluginbase.h>
@@ -18,16 +17,6 @@
 #include <pluginterfaces/vst/ivsteditcontroller.h>
 #include <pluginterfaces/vst/ivstparameterchanges.h>
 #include <pluginterfaces/vst/vsttypes.h>
-
-// Provide the FUID definitions for the interfaces we use. In a full SDK
-// build these would come from base/source; we supply them here so the host
-// does not need to link the SDK base library.
-DEF_CLASS_IID(FUnknown)
-DEF_CLASS_IID(IBStream)
-DEF_CLASS_IID(IPluginFactory)
-DEF_CLASS_IID(IComponent)
-DEF_CLASS_IID(IAudioProcessor)
-DEF_CLASS_IID(IEditController)
 
 // The SDK declares FUnknownPrivate::atomicAdd in a header but implements it
 // in base/source; provide the (identical) implementation here.
