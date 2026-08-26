@@ -39,6 +39,17 @@ namespace vst3 {
 using namespace Steinberg;
 using namespace Steinberg::Vst; // IComponent, IAudioProcessor, AudioBusBuffers, ...
 
+// --------------------------------------------------------------------------
+// Local ABI constants (avoids dependency on SDK headers that may place or
+// name these differently across versions).
+static constexpr SpeakerArrangement kStgrMono = 0x4;
+static constexpr MediaType          kMediaAudio = 0;
+static constexpr BusDirection       kBusDirIn = 0;
+static constexpr BusDirection       kBusDirOut = 1;
+
+// VST3 "Audio Module Class" category string.
+static const char* const kStgrAudioEffectClass = "Audio Module Class";
+
 // ParameterInfo.title is UTF-16; narrow it for our config (ASCII plugin
 // names are the norm; non-ASCII names degrade gracefully).
 inline std::string narrow_name(const char16* s)
@@ -144,7 +155,6 @@ private:
     IComponent* component_ = nullptr;
     IAudioProcessor* processor_ = nullptr;
     IEditController* controller_ = nullptr;
-    IPlugInterfaceSupport* plugInterfaceSupport_ = nullptr;
 
     int latency_ = 0;
     int32 numInputs_ = 0, numOutputs_ = 0;
@@ -176,14 +186,14 @@ bool Vst3Processor::init(double sampleRate, int channels)
     if (!factory_) { shutdown(); return false; }
 
     // Enumerate classes.
-    FactoryInfo factoryInfo;
+    PFactoryInfo factoryInfo;
     factory_->getFactoryInfo(&factoryInfo);
     const int32 count = factory_->countClasses();
     PClassInfo classInfo;
     bool found = false;
     for (int32 i = 0; i < count; ++i) {
         if (factory_->getClassInfo(i, &classInfo) != kResultOk) continue;
-        if (strcmp(classInfo.category, kVstAudioEffectClass) == 0) {
+        if (strcmp(classInfo.category, kStgrAudioEffectClass) == 0) {
             found = true;
             break;
         }
@@ -234,14 +244,14 @@ bool Vst3Processor::init(double sampleRate, int channels)
     numInputs_ = 0;
     numOutputs_ = 0;
     if (component_) {
-        for (int32 i = 0; i < component_->getBusCount(kAudio, kInput); ++i) {
-            if (component_->getBusInfo(kAudio, kInput, i, busInfo) == kResultOk) {
+        for (int32 i = 0; i < component_->getBusCount(kMediaAudio, kBusDirIn); ++i) {
+            if (component_->getBusInfo(kMediaAudio, kBusDirIn, i, busInfo) == kResultOk) {
                 numInputs_++;
                 numChannelsIn_ = busInfo.channelCount;
             }
         }
-        for (int32 i = 0; i < component_->getBusCount(kAudio, kOutput); ++i) {
-            if (component_->getBusInfo(kAudio, kOutput, i, busInfo) == kResultOk) {
+        for (int32 i = 0; i < component_->getBusCount(kMediaAudio, kBusDirOut); ++i) {
+            if (component_->getBusInfo(kMediaAudio, kBusDirOut, i, busInfo) == kResultOk) {
                 numOutputs_++;
                 numChannelsOut_ = busInfo.channelCount;
             }
@@ -251,8 +261,8 @@ bool Vst3Processor::init(double sampleRate, int channels)
     if (numChannelsOut_ == 0) numChannelsOut_ = 1;
 
     // Set bus arrangements (mono in, mono out).
-    SpeakerArrangement inArr[2] = {kMono, kMono};
-    SpeakerArrangement outArr[2] = {kMono, kMono};
+    SpeakerArrangement inArr[2] = {kStgrMono, kStgrMono};
+    SpeakerArrangement outArr[2] = {kStgrMono, kStgrMono};
     processor_->setBusArrangements(inArr, numInputs_, outArr, numOutputs_);
 
     // Activate.
@@ -270,7 +280,7 @@ bool Vst3Processor::init(double sampleRate, int channels)
     outBuf_.resize((size_t)maxFrames * numChannelsOut_);
     inPtrs_.resize(numChannelsIn_);
     outPtrs_.resize(numChannelsOut_);
-
+    (void)channels;
     return true;
 }
 
@@ -326,26 +336,19 @@ void Vst3Processor::process(float* interleaved, int frames, int channels)
 std::vector<PluginParamInfo> Vst3Processor::parameters()
 {
     std::vector<PluginParamInfo> out;
-    if (!component_ && !controller_) return out;
-
-    IComponent* comp = component_;
     IEditController* ec = controller_;
+    if (!ec) return out;
 
-    int32 count = 0;
-    if (ec) {
-        count = ec->getParameterCount();
-    }
+    int32 count = ec->getParameterCount();
     for (int32 i = 0; i < count; ++i) {
         PluginParamInfo p;
         p.id = std::to_string(i);
         ParameterInfo info{};
-        if (ec) {
-            if (ec->getParameterInfo(i, info) == kResultOk) {
-                p.name = narrow_name(info.title);
-                p.value = info.defaultNormalizedValue;
-                p.def = info.defaultNormalizedValue;
-                p.stepCount = info.stepCount;
-            }
+        if (ec->getParameterInfo(i, info) == kResultOk) {
+            p.name = narrow_name(info.title);
+            p.value = info.defaultNormalizedValue;
+            p.def = info.defaultNormalizedValue;
+            p.stepCount = info.stepCount;
         }
         if (p.name.empty()) p.name = "Param " + std::to_string(i);
         out.push_back(p);
@@ -393,8 +396,7 @@ void Vst3Processor::shutdown()
 
 std::unique_ptr<PluginProcessor> create_vst3(const std::wstring& path)
 {
-    (void)path;
-    return {}; // VST3 support not available in this build
+    return std::make_unique<vst3::Vst3Processor>(path);
 }
 
 #else // !STGR_HAVE_VST3
